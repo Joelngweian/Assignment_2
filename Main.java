@@ -29,10 +29,12 @@ public class Main {
         } while (choice != 6);
     }
 
-    // 1. Add Order [cite: 23]
+    // 1. Add Order
     public static void addOrder() {
         System.out.print("Enter Type (R for Regular, P for Premium): ");
-        char type = scanner.next().toUpperCase().charAt(0);
+        String input = scanner.next();
+        if (input.isEmpty()) return;
+        char type = input.toUpperCase().charAt(0);
 
         System.out.print("Enter Customer ID (5 chars): ");
         String id = scanner.next();
@@ -57,22 +59,74 @@ public class Main {
         }
     }
 
-    // 4. Display Sorted [cite: 26]
+    // 2. Remove Order (Fixed: Moved outside addOrder and made static)
+    public static void removeOrder() {
+        System.out.print("Enter Customer ID to remove: ");
+        String id = scanner.next();
+
+        // Java 8 approach to remove if ID matches
+        boolean removed = orderList.removeIf(c -> c.getCustomerID().equalsIgnoreCase(id));
+
+        if (removed) {
+            System.out.println("Order removed successfully.");
+        } else {
+            System.out.println("Customer ID not found.");
+        }
+    }
+
+    // 3. Find Order (Added this as it was missing)
+    public static void findOrder() {
+        System.out.print("Enter Customer ID to search: ");
+        String id = scanner.next();
+        boolean found = false;
+
+        for (Customer c : orderList) {
+            if (c.getCustomerID().equalsIgnoreCase(id)) {
+                System.out.println("Order Found:");
+                System.out.println(c.toString());
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Customer ID not found.");
+        }
+    }
+
+    // 4. Display Sorted
     public static void displaySortedOrders() {
         System.out.println("Sort by: 1. CustomerID  2. Shipping Method");
         int sortType = scanner.nextInt();
 
         if (sortType == 1) {
-            Collections.sort(orderList); // 使用 Comparable 默认排序
+            Collections.sort(orderList);
         } else {
-            // 使用 Comparator 按 Shipping Method 排序
             orderList.sort(Comparator.comparing(Customer::getShippingMethod));
         }
 
-        // 打印表头
         System.out.println("ID         Name            Qty        Method                    Total");
         for (Customer c : orderList) {
             System.out.println(c.toString());
+        }
+    }
+
+    // 5. Print Specific Orders (Added this as it was missing)
+    public static void printSpecificOrders() {
+        System.out.println("Filter by: 1. Regular  2. Premium");
+        int filterChoice = scanner.nextInt();
+        boolean foundAny = false;
+
+        for (Customer c : orderList) {
+            if ((filterChoice == 1 && c instanceof RegularCustomer) ||
+                    (filterChoice == 2 && c instanceof PremiumCustomer)) {
+                System.out.println(c.toString());
+                foundAny = true;
+            }
+        }
+
+        if (!foundAny) {
+            System.out.println("No records found for this type.");
         }
     }
 }
